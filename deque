@@ -1,0 +1,33 @@
+#You run an e-commerce website and want to record the last N order ids in a log. Implement a data structure to accomplish this, with the following API:
+#record(order_id): adds the order_id to the log
+#get_last(i): gets the ith last element from the log. i is guaranteed to be smaller than or equal to N.
+
+from collections import deque
+
+class OrderLog:
+    def __init__(self, N):
+        self.log = deque(maxlen=N)
+    
+    def record(self, order_id):
+        self.log.append(order_id)
+    
+    def get_last(self, i):
+        if i <= len(self.log):
+            return self.log[-i]
+        else:
+            return None  # Index out of range
+
+# Example usage:
+order_log = OrderLog(55)  # Initialize with a log size of 5
+
+order_log.record(1)
+order_log.record(2)
+order_log.record(3)
+order_log.record(5)
+order_log.record(7)
+order_log.record(22)
+
+print(order_log.get_last(1))  # Output: 3
+print(order_log.get_last(2))  # Output: 2
+print(order_log.get_last(3))  # Output: 1
+print(order_log.get_last(5))  # Output: None (log has only 3 elements)
