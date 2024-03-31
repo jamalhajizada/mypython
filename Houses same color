@@ -1,0 +1,63 @@
+#A builder is looking to build a row of N houses that can be of K different colors. He has a goal of minimizing cost while ensuring that no two neighboring houses are of the same color.
+#Given an N by K matrix where the nth row and kth column represents the cost to build the nth house with kth color, return the minimum cost which achieves this goal.
+
+import numpy as np
+
+def min_cost_paint_houses_with_sequence(costs):
+    if costs.size == 0:
+        return 0, []
+
+    N, K = costs.shape
+    dp = costs.copy()
+    # Track the color choices for each house
+    choices = np.zeros((N, K), dtype=int)
+
+    for n in range(1, N):
+        for k in range(K):
+            excluded_current = dp[n - 1][:k].tolist() + dp[n - 1][k + 1:].tolist()
+            min_cost_prev_house = min(excluded_current)
+            min_cost_index = excluded_current.index(min_cost_prev_house)
+            # Adjust index for the excluded color
+            if min_cost_index >= k:
+                min_cost_index += 1
+            dp[n][k] = costs[n][k] + min_cost_prev_house
+            choices[n][k] = min_cost_index
+
+    final_min_cost = min(dp[-1])
+    final_choice = dp[-1].tolist().index(final_min_cost)
+
+    # Reconstruct the sequence of choices
+    sequence = [final_choice]
+    for n in range(N - 1, 0, -1):
+        sequence.append(choices[n][sequence[-1]])
+    sequence.reverse()
+
+    return final_min_cost, sequence
+
+
+# Example usage
+costs_matrix = np.array([
+    [23, 28, 8, 20, 94, 73, 15, 98, 85, 25, 69, 47, 58, 54, 98],
+    [18, 54, 92, 99, 25, 52, 67, 52, 90, 56, 62, 58, 87, 70, 35],
+    [87, 79, 66, 23, 73, 50, 41, 97, 25, 8, 38, 34, 63, 90, 41],
+    [63, 63, 3, 60, 64, 73, 19, 63, 39, 69, 66, 47, 93, 94, 63],
+    [13, 94, 66, 66, 69, 96, 67, 96, 60, 96, 66, 93, 37, 70, 39],
+    [37, 76, 66, 63, 73, 90, 41, 67, 69, 3, 33, 34, 63, 60, 41],
+    [61, 61, 1, 60, 64, 21, 19, 61, 19, 69, 66, 42, 91, 94, 61],
+    [11, 94, 66, 66, 69, 96, 62, 96, 60, 96, 66, 91, 12, 20, 19],
+    [12, 26, 66, 61, 21, 90, 41, 62, 69, 1, 11, 14, 61, 60, 41],
+    [23, 28, 8, 20, 94, 73, 95, 98, 85, 25, 69, 47, 58, 54, 98],
+    [98, 54, 92, 99, 25, 52, 67, 52, 90, 56, 62, 58, 87, 70, 35],
+    [87, 79, 66, 23, 73, 50, 49, 97, 25, 8, 38, 34, 63, 90, 49],
+    [63, 63, 3, 60, 64, 73, 99, 63, 39, 69, 66, 47, 93, 94, 63],
+    [93, 94, 66, 66, 69, 96, 67, 96, 60, 96, 66, 93, 37, 70, 39],
+    [37, 76, 66, 63, 73, 90, 49, 67, 69, 3, 33, 34, 63, 60, 49],
+    [69, 69, 9, 60, 64, 29, 99, 69, 99, 69, 66, 42, 99, 94, 69],
+    [99, 94, 66, 66, 69, 96, 62, 96, 60, 96, 66, 99, 92, 20, 99],
+    [92, 26, 66, 69, 29, 90, 49, 62, 69, 9, 99, 94, 69, 60, 49],
+    # Add more rows for more houses
+])
+
+min_cost, color_sequence = min_cost_paint_houses_with_sequence(costs_matrix)
+print("Minimum cost:", min_cost)
+print("Color sequence:", color_sequence)
